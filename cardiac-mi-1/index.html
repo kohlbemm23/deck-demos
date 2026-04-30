@@ -157,7 +157,6 @@ h1, h2, h3, h4, h5, h6 {
   max-width: 220px;
   height: auto;
   display: block;
-  transition: opacity 250ms ease;
 }
 .speech {
   background: var(--bg-card);
@@ -571,7 +570,7 @@ const CASE_DATA = {
   // The end / sales screen
   end: {
     headline: "Want to learn more about this unfolding case study deck?",
-    body: "Each deck runs 30+ cards through a full case — every branching path, every rationale, designed for small-group active learning.",
+    body: "Each deck is a complete case study with branching scenarios, rationale and puzzles to keep students engaged. Designed for small-group active learning.",
     cta: "See the Cardiac MI deck →",
     ctaHref: "https://breakoutrndeck.com/cardiac-mi-deck"
   }
@@ -594,11 +593,21 @@ function setStudentMood(mood) {
   const img = $('#student-img');
   const newSrc = STUDENT_IMAGES[mood] || STUDENT_IMAGES.thinking;
   if (img.src.endsWith(newSrc)) return;
-  img.style.opacity = '0';
-  setTimeout(() => {
-    img.src = newSrc;
-    img.style.opacity = '1';
-  }, 200);
+  img.src = newSrc;
+}
+
+// Preload all student + card images on page load so subsequent
+// scene transitions are instant (no flash, no race between
+// student face change and card image fetch).
+function preloadAllImages() {
+  Object.values(STUDENT_IMAGES).forEach(src => {
+    const i = new Image();
+    i.src = src;
+  });
+  CASE_DATA.scenes.forEach(scene => {
+    const i = new Image();
+    i.src = scene.cardImage;
+  });
 }
 
 function buildProgress() {
@@ -707,6 +716,7 @@ $('#student-img').src = STUDENT_IMAGES.thinking;
 $('#student-img').alt = CASE_DATA.student.name;
 
 buildProgress();
+preloadAllImages();
 
 // Wire end-screen replay
 $('#end-replay-btn').onclick = returnToStart;
