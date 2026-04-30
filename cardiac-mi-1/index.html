@@ -114,7 +114,7 @@ h1, h2, h3, h4, h5, h6 {
   margin: 0 auto;
   padding: 24px;
   display: grid;
-  grid-template-rows: auto 1fr auto;
+  grid-template-rows: auto 1fr;
   gap: 22px;
   min-height: calc(100vh - 50px);
 }
@@ -217,14 +217,14 @@ h1, h2, h3, h4, h5, h6 {
   box-shadow: var(--shadow-md), 0 0 0 3px rgba(246, 142, 100, 0.3);
 }
 
-/* Bottom bar */
+/* Bottom bar — sits directly under the card */
 .bottombar {
   display: flex;
   justify-content: space-between;
   align-items: center;
   gap: 16px;
   flex-wrap: wrap;
-  padding-top: 4px;
+  padding-top: 16px;
 }
 .hint {
   font-size: 13px;
@@ -492,6 +492,10 @@ h1, h2, h3, h4, h5, h6 {
       <div class="card-frame" id="card-frame">
         <img id="card-img" src="" alt="" />
       </div>
+      <div class="bottombar" id="bottombar">
+        <div class="hint" id="hint"></div>
+        <div id="action-btns"></div>
+      </div>
     </div>
   </div>
 
@@ -505,11 +509,6 @@ h1, h2, h3, h4, h5, h6 {
     </div>
     <button class="end-replay" id="end-replay-btn">↺ Replay demo</button>
   </div>
-
-  <div class="bottombar" id="bottombar">
-    <div class="hint" id="hint"></div>
-    <div id="action-btns"></div>
-  </div>
 </div>
 
 <script>
@@ -517,7 +516,7 @@ h1, h2, h3, h4, h5, h6 {
    CASE DATA — the only thing that changes per case
    ============================================================ */
 const CASE_DATA = {
-  bannerText: "Cardiac MI · One decision from a 30-card case deck",
+  bannerText: "Myocardial Infarction · one decision from the complete case study",
 
   student: {
     name: "Sam",
@@ -536,7 +535,7 @@ const CASE_DATA = {
       cardAlt: "Card 23 — Physical Assessment",
       sam: {
         mood: "thinking",
-        line: "Mr. Johnson just rolled in — chest pain radiating to his jaw, diaphoretic. Classic MI presentation. I need aspirin on board fast."
+        line: "Mr. Patel just rolled in. Chest pain radiating to his jaw, diaphoretic. Classic MI presentation. I need aspirin on board fast."
       }
     },
     {
@@ -544,7 +543,7 @@ const CASE_DATA = {
       cardAlt: "Card 26 — Clinical Decision Point",
       sam: {
         mood: "decision",
-        line: "There's a standing order for aspirin. Chewable or rectal — let me think about what's right for this patient."
+        line: "There's a standing order for aspirin. Chewable or rectal. Let me think about what's right for this patient."
       }
     },
     {
@@ -552,7 +551,7 @@ const CASE_DATA = {
       cardAlt: "Card 27 — Wrong-answer rationale",
       sam: {
         mood: "concerned",
-        line: "Even if a student picks rectal, the deck walks them through the why — oral is faster, less invasive. Wrong answers aren't dead ends."
+        line: "Even if a student picks rectal, the deck walks them through the why: oral is faster, less invasive. Wrong answers are corrected immediately with rationale."
       },
       outcome: "incorrect"
     },
@@ -561,7 +560,7 @@ const CASE_DATA = {
       cardAlt: "Card 12 — Right-answer rationale",
       sam: {
         mood: "happy",
-        line: "Chewable wins — fast oral mucosa absorption gets him into circulation right away, even with NPO orders."
+        line: "Chewable wins 🎉 Oral aspirin is quickly absorbed, even with NPO orders."
       },
       outcome: "correct"
     }
