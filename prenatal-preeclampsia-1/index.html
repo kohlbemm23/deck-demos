@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>BreakoutRN — Prenatal Preeclampsia Case Demo</title>
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600&family=Poppins:wght@400;500;600&display=swap');
+
+:root {
+  --brand-cream: #F9F6F0;
+  --brand-navy: #06436b;
+  --brand-sage: #b2cb9a;
+  --brand-teal: #92d6e2;
+  --brand-coral: #f68e64;
+  --brand-gold: #fec86c;
+  --brand-sky: #b7d3e0;
+  --brand-lavender: #e6cad9;
+
+  --text-primary: var(--brand-navy);
+  --text-secondary: rgba(6, 67, 107, 0.7);
+  --bg-card: rgba(255, 255, 255, 0.92);
+  --border-soft: rgba(183, 211, 224, 0.3);
+  --border-medium: rgba(183, 211, 224, 0.55);
+
+  --shadow-sm: 0 1px 2px 0 rgb(50 28 28 / 0.05);
+  --shadow-md: 0 4px 6px -1px rgb(50 28 28 / 0.1), 0 2px 4px -2px rgb(50 28 28 / 0.1);
+  --shadow-lg: 0 10px 15px -3px rgb(50 28 28 / 0.1), 0 4px 6px -4px rgb(50 28 28 / 0.1);
+
+  --radius: 12px;
+  --radius-sm: 8px;
+  --radius-md: 10px;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body {
+  min-height: 100vh;
+  font-family: 'Poppins', system-ui, -apple-system, sans-serif;
+  font-weight: 400;
+  font-feature-settings: "rlig" 1, "calt" 1;
+  color: var(--text-primary);
+  background:
+    linear-gradient(to bottom,
+      var(--brand-cream) 0%,
+      rgba(230, 202, 217, 0.1) 50%,
+      #ffffff 100%);
+  background-attachment: fixed;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Manrope', system-ui, sans-serif;
+  font-weight: 400;
+  letter-spacing: -0.01em;
+}
+
+/* Demo banner */
+.demo-banner {
+  background: rgba(230, 202, 217, 0.3);
+  border-bottom: 1px solid var(--brand-lavender);
+  padding: 12px 20px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 13px;
+}
+.demo-badge {
+  background: var(--brand-navy);
+  color: #fff;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+.demo-banner-text { color: var(--brand-navy); font-weight: 500; }
+
+/* Stage */
+.stage {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 24px;
+  display: grid;
+  grid-template-rows: auto 1fr;
+  gap: 22px;
+  min-height: calc(100vh - 50px);
+}
+
+/* Progress dots */
+.progress-row {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+}
+.dot {
+  width: 36px;
+  height: 4px;
+  background: rgba(6, 67, 107, 0.15);
+  border-radius: 2px;
+  transition: background 400ms ease;
+}
+.dot.active { background: var(--brand-navy); }
+.dot.done { background: rgba(6, 67, 107, 0.5); }
+
+/* Main case panel */
+.panel {
+  display: grid;
+  grid-template-columns: 220px 1fr;
+  gap: 36px;
+  align-items: start;
+}
+
+/* Student character */
+.student-area {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  position: sticky;
+  top: 24px;
+}
+.student-img {
+  width: 100%;
+  max-width: 220px;
+  height: auto;
+  display: block;
+}
+.speech {
+  background: var(--bg-card);
+  border: 1px solid var(--border-medium);
+  border-radius: var(--radius);
+  padding: 14px 16px;
+  font-size: 14px;
+  line-height: 1.5;
+  font-weight: 400;
+  color: var(--brand-navy);
+  position: relative;
+  box-shadow: var(--shadow-sm);
+  width: 100%;
+}
+.speech::before {
+  content: '';
+  position: absolute;
+  top: -7px;
+  left: 32px;
+  width: 13px;
+  height: 13px;
+  background: var(--bg-card);
+  border-left: 1px solid var(--border-medium);
+  border-top: 1px solid var(--border-medium);
+  transform: rotate(45deg);
+}
+
+/* Card frame */
+.card-stage { position: relative; }
+.card-frame {
+  background: var(--bg-card);
+  border: 1px solid var(--border-medium);
+  border-radius: var(--radius);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+  position: relative;
+  transition: border-color 400ms ease, box-shadow 400ms ease;
+}
+.card-frame.correct {
+  border-color: var(--brand-sage);
+  box-shadow: var(--shadow-md), 0 0 0 3px rgba(178, 203, 154, 0.22);
+}
+.card-frame.incorrect {
+  border-color: var(--brand-coral);
+  box-shadow: var(--shadow-md), 0 0 0 3px rgba(246, 142, 100, 0.22);
+}
+.card-frame img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+.card-frame.clickable { cursor: pointer; }
+.card-frame.clickable:hover { box-shadow: var(--shadow-md); }
+.card-frame.clickable.correct:hover {
+  box-shadow: var(--shadow-md), 0 0 0 3px rgba(178, 203, 154, 0.3);
+}
+.card-frame.clickable.incorrect:hover {
+  box-shadow: var(--shadow-md), 0 0 0 3px rgba(246, 142, 100, 0.3);
+}
+
+/* Bottom bar — sits directly under the card */
+.bottombar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+  padding-top: 16px;
+}
+.hint {
+  font-size: 13px;
+  color: var(--text-secondary);
+  font-weight: 500;
+  letter-spacing: 0.02em;
+}
+
+/* Educator callout — appears below card on flagged scenes */
+.educator-callout {
+  width: 100%;
+  background: rgba(254, 200, 108, 0.18);
+  border: 1px solid rgba(254, 200, 108, 0.55);
+  border-radius: var(--radius-sm);
+  padding: 10px 14px;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--brand-navy);
+  font-weight: 500;
+  margin-top: 4px;
+}
+
+/* Buttons */
+.btn {
+  background: var(--brand-sage);
+  color: var(--brand-navy);
+  border: none;
+  border-radius: var(--radius-md);
+  padding: 12px 24px;
+  font-family: 'Poppins', sans-serif;
+  font-weight: 600;
+  font-size: 15px;
+  cursor: pointer;
+  transition: background-color 200ms ease;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  line-height: 1;
+}
+.btn:hover { background: rgba(178, 203, 154, 0.85); }
+.btn:focus-visible {
+  outline: 2px solid var(--brand-navy);
+  outline-offset: 2px;
+}
+.btn.secondary {
+  background: transparent;
+  color: var(--brand-navy);
+  border: 1.5px solid rgba(6, 67, 107, 0.2);
+}
+.btn.secondary:hover { background: rgba(6, 67, 107, 0.05); }
+
+/* END SCREEN */
+.end-screen {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  padding: 40px 24px 24px;
+  min-height: 480px;
+  animation: fadeIn 500ms ease;
+}
+.end-card {
+  background: rgba(249, 246, 240, 0.6);
+  border: 1px solid var(--brand-lavender);
+  border-radius: var(--radius);
+  padding: 40px 36px;
+  max-width: 560px;
+  width: 100%;
+  text-align: center;
+  box-shadow: var(--shadow-lg);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+.end-eyebrow {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+}
+.end-headline {
+  font-size: clamp(20px, 3vw, 26px);
+  line-height: 1.2;
+  color: var(--brand-navy);
+}
+.end-body {
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--text-secondary);
+  max-width: 440px;
+}
+.end-cta {
+  margin-top: 8px;
+  font-size: 15px;
+  padding: 14px 28px;
+}
+.end-replay {
+  background: none;
+  border: none;
+  font-family: 'Poppins', sans-serif;
+  font-size: 13px;
+  color: var(--text-secondary);
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.end-replay:hover { color: var(--brand-navy); }
+
+/* Modal */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(6, 67, 107, 0.45);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  transition: opacity 300ms ease;
+}
+.modal-overlay.modal-hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+.modal-card {
+  background: var(--brand-cream);
+  border: 1px solid var(--border-medium);
+  border-radius: var(--radius);
+  padding: 32px 28px 24px;
+  max-width: 420px;
+  width: calc(100% - 40px);
+  box-shadow: var(--shadow-lg);
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.modal-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+.modal-student {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 2px solid var(--brand-lavender);
+  flex-shrink: 0;
+  background: var(--brand-sky);
+}
+.modal-student img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top center;
+}
+.modal-headline {
+  font-size: 22px;
+  line-height: 1.2;
+  color: var(--brand-navy);
+}
+.modal-body {
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--text-secondary);
+}
+.modal-actions { display: flex; justify-content: flex-end; }
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+</style>
+</head>
+<body>
+
+<!-- Demo banner -->
+<div class="demo-banner">
+  <span class="demo-badge">
+    <svg width="10" height="10" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="6" cy="6" r="5.5" stroke="white" stroke-width="1"/>
+      <circle cx="6" cy="8.5" r="0.7" fill="white"/>
+      <rect x="5.4" y="3" width="1.2" height="3.5" rx="0.6" fill="white"/>
+    </svg>
+    Demo
+  </span>
+  <span class="demo-banner-text" id="demo-text">Loading…</span>
+</div>
+
+<!-- Welcome modal -->
+<div class="modal-overlay" id="modal">
+  <div class="modal-card">
+    <div class="modal-row">
+      <div class="modal-student">
+        <img id="modal-student-img" src="" alt="" />
+      </div>
+      <h2 class="modal-headline" id="modal-headline">…</h2>
+    </div>
+    <p class="modal-body" id="modal-body">…</p>
+    <div class="modal-actions">
+      <button class="btn" onclick="dismissModal()" id="modal-cta">…</button>
+    </div>
+  </div>
+</div>
+
+<!-- Main stage -->
+<div class="stage" id="stage" style="visibility: hidden;">
+  <div class="progress-row" id="progress-row"></div>
+
+  <!-- Case panel: student + card -->
+  <div class="panel" id="case-panel">
+    <div class="student-area">
+      <img class="student-img" id="student-img" src="" alt="" />
+      <div class="speech" id="speech">…</div>
+    </div>
+
+    <div class="card-stage">
+      <div class="card-frame" id="card-frame">
+        <img id="card-img" src="" alt="" />
+      </div>
+      <div class="bottombar" id="bottombar">
+        <div class="hint" id="hint"></div>
+        <div id="action-btns"></div>
+        <div class="educator-callout" id="callout" style="display:none"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- End screen: shown after the last card. Replaces the panel. -->
+  <div class="end-screen" id="end-screen">
+    <div class="end-card">
+      <div class="end-eyebrow">Case complete</div>
+      <h2 class="end-headline" id="end-headline">…</h2>
+      <p class="end-body" id="end-body">…</p>
+      <a class="btn end-cta" id="end-cta-btn" href="" target="_blank" rel="noopener">…</a>
+    </div>
+    <button class="end-replay" id="end-replay-btn">↺ Replay demo</button>
+  </div>
+</div>
+
+<script>
+/* ============================================================
+   CASE DATA — the only thing that changes per case
+   ============================================================ */
+const CASE_DATA = {
+  bannerText: "Prenatal Preeclampsia · one decision from the complete case study",
+
+  student: {
+    name: "Ava",
+    imagePrefix: "ava-"
+  },
+
+  modal: {
+    headline: "Meet Ava, RN.",
+    body: "She's working an OB case today. Walk through her assessment with her.",
+    cta: "Start the case →"
+  },
+
+  scenes: [
+    {
+      cardImage: "card-9.png",
+      cardAlt: "Card 9 — Patient History",
+      sam: {
+        mood: "thinking",
+        line: "My patient is Jada Campbell, 18 years old. I better read this history carefully."
+      }
+    },
+    {
+      cardImage: "card-21.png",
+      cardAlt: "Card 21 — Last Note from PCP",
+      sam: {
+        mood: "thinking",
+        line: "I want the full picture before I draw any conclusions."
+      }
+    },
+    {
+      cardImage: "card-2.png",
+      cardAlt: "Card 2 — Assessment",
+      sam: {
+        mood: "decision",
+        line: "Seems like a fairly normal prenatal assessment except for a few things."
+      },
+      callout: "🚩 Students should identify clinical red flags from this card."
+    },
+    {
+      cardImage: "card-20.png",
+      cardAlt: "Card 20 — Medication Reconciliation",
+      sam: {
+        mood: "happy",
+        line: "I recognize some of these medications, let's see if I can figure it out."
+      },
+      callout: "This card sends students to an online medication reconciliation puzzle via the QR code. This case study has Next-Gen NCLEX style pharmacology questions built right in. 🤳 You can scan the code and practice the puzzle.",
+      outcome: "correct"
+    }
+  ],
+
+  end: {
+    headline: "Want to learn more about this unfolding case study deck?",
+    body: "Each deck is a complete case study with branching scenarios, rationale and puzzles to keep students engaged. Designed for small-group active learning.",
+    cta: "See the Prenatal Preeclampsia deck →",
+    ctaHref: "https://breakoutrn.com/products/%F0%9F%8F%BD-prenatal-preeclampsia?variant=43151359967266"
+  }
+};
+
+/* ============================================================
+   ENGINE
+   ============================================================ */
+const $ = sel => document.querySelector(sel);
+let currentIdx = 0;
+
+const STUDENT_IMAGES = {
+  thinking:  CASE_DATA.student.imagePrefix + "thinking.png",
+  decision:  CASE_DATA.student.imagePrefix + "decision.png",
+  happy:     CASE_DATA.student.imagePrefix + "happy.png",
+  concerned: CASE_DATA.student.imagePrefix + "concerned.png"
+};
+
+function setStudentMood(mood) {
+  const img = $('#student-img');
+  const newSrc = STUDENT_IMAGES[mood] || STUDENT_IMAGES.thinking;
+  if (img.src.endsWith(newSrc)) return;
+  img.src = newSrc;
+}
+
+function preloadAllImages() {
+  Object.values(STUDENT_IMAGES).forEach(src => {
+    const i = new Image();
+    i.src = src;
+  });
+  CASE_DATA.scenes.forEach(scene => {
+    const i = new Image();
+    i.src = scene.cardImage;
+  });
+}
+
+function buildProgress() {
+  const row = $('#progress-row');
+  row.innerHTML = '';
+  for (let i = 0; i < CASE_DATA.scenes.length; i++) {
+    const dot = document.createElement('div');
+    dot.className = 'dot';
+    dot.id = 'dot-' + i;
+    row.appendChild(dot);
+  }
+}
+
+function setProgress(idx) {
+  for (let i = 0; i < CASE_DATA.scenes.length; i++) {
+    const dot = document.getElementById('dot-' + i);
+    if (!dot) continue;
+    dot.classList.remove('active', 'done');
+    if (i < idx) dot.classList.add('done');
+    if (i === idx) dot.classList.add('active');
+  }
+}
+
+function renderScene(idx) {
+  const scene = CASE_DATA.scenes[idx];
+  if (!scene) return;
+  currentIdx = idx;
+
+  const frame = $('#card-frame');
+  frame.classList.remove('correct', 'incorrect', 'clickable');
+
+  const img = $('#card-img');
+  img.src = scene.cardImage;
+  img.alt = scene.cardAlt || '';
+
+  if (scene.outcome === 'correct') frame.classList.add('correct');
+  if (scene.outcome === 'incorrect') frame.classList.add('incorrect');
+
+  setStudentMood(scene.sam.mood);
+  $('#speech').textContent = scene.sam.line;
+
+  setProgress(idx);
+
+  $('#action-btns').innerHTML = '';
+  frame.onclick = null;
+
+  const isLast = idx === CASE_DATA.scenes.length - 1;
+  const total = CASE_DATA.scenes.length;
+  $('#hint').textContent = `Card ${idx + 1} of ${total}`;
+
+  // Educator callout
+  const calloutEl = $('#callout');
+  if (scene.callout) {
+    calloutEl.textContent = scene.callout;
+    calloutEl.style.display = 'block';
+  } else {
+    calloutEl.style.display = 'none';
+  }
+
+  frame.classList.add('clickable');
+  frame.onclick = () => isLast ? showEndScreen() : renderScene(idx + 1);
+
+  const nextBtn = document.createElement('button');
+  nextBtn.className = 'btn';
+  nextBtn.textContent = 'Next →';
+  nextBtn.onclick = () => isLast ? showEndScreen() : renderScene(idx + 1);
+  $('#action-btns').appendChild(nextBtn);
+}
+
+function showEndScreen() {
+  $('#progress-row').style.display = 'none';
+  $('#case-panel').style.display = 'none';
+  $('#bottombar').style.display = 'none';
+  $('#end-screen').style.display = 'flex';
+
+  $('#end-headline').textContent = CASE_DATA.end.headline;
+  const bodyEl = $('#end-body');
+  if (CASE_DATA.end.body) {
+    bodyEl.textContent = CASE_DATA.end.body;
+    bodyEl.style.display = 'block';
+  } else {
+    bodyEl.style.display = 'none';
+  }
+  $('#end-cta-btn').href = CASE_DATA.end.ctaHref;
+  $('#end-cta-btn').textContent = CASE_DATA.end.cta;
+}
+
+function returnToStart() {
+  $('#progress-row').style.display = 'flex';
+  $('#case-panel').style.display = 'grid';
+  $('#bottombar').style.display = 'flex';
+  $('#end-screen').style.display = 'none';
+  renderScene(0);
+}
+
+function dismissModal() {
+  $('#modal').classList.add('modal-hidden');
+  $('#stage').style.visibility = 'visible';
+  renderScene(0);
+}
+
+// Init from CASE_DATA
+$('#modal-headline').textContent = CASE_DATA.modal.headline;
+$('#modal-body').textContent = CASE_DATA.modal.body;
+$('#modal-cta').textContent = CASE_DATA.modal.cta;
+$('#demo-text').textContent = CASE_DATA.bannerText;
+
+$('#modal-student-img').src = STUDENT_IMAGES.happy;
+$('#modal-student-img').alt = CASE_DATA.student.name + ', RN';
+$('#student-img').src = STUDENT_IMAGES.thinking;
+$('#student-img').alt = CASE_DATA.student.name;
+
+buildProgress();
+preloadAllImages();
+
+$('#end-replay-btn').onclick = returnToStart;
+
+document.addEventListener('keydown', e => {
+  if (!$('#modal').classList.contains('modal-hidden')) return;
+  if (e.key === 'Enter' || e.key === ' ' || e.key === 'ArrowRight') {
+    if ($('#end-screen').style.display === 'flex') return;
+    if (currentIdx < CASE_DATA.scenes.length - 1) {
+      renderScene(currentIdx + 1);
+    } else {
+      showEndScreen();
+    }
+  }
+});
+</script>
+</body>
+</html>
