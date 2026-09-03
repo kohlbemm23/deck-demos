@@ -3,7 +3,8 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>BreakoutRN — Cardiac MI Case Demo</title>
+<title>Pediatric ER · BreakoutRN Case Demo</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%94%91%3C/text%3E%3C/svg%3E" />
 
 <!--
   ============================================================
@@ -546,6 +547,7 @@ h1, h2, h3, h4, h5, h6 {
    CASE DATA — the only thing that changes per case
    ============================================================ */
 const CASE_DATA = {
+  pageTitle: "Pediatric ER · BreakoutRN Case Demo",
   bannerText: "Pediatric Emergency Department · one decision from the complete case study",
 
   student: {
@@ -753,6 +755,8 @@ $('#modal-student-img').src = STUDENT_IMAGES.happy;
 $('#modal-student-img').alt = CASE_DATA.student.name + ', RN';
 $('#student-img').src = STUDENT_IMAGES.thinking;
 $('#student-img').alt = CASE_DATA.student.name;
+
+if (CASE_DATA.pageTitle) document.title = CASE_DATA.pageTitle;
 
 buildProgress();
 preloadAllImages();
